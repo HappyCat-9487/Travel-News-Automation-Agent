@@ -40,7 +40,7 @@ Before deploying this workflow, you will need the following items:
     * Save and activate the workflow in n8n.
     * You can either run it manually or set up a timed trigger for full automation.
     
-* **For more information, here is my Notion as a reference**: <https://www.notion.so/Travel-News-Automation-Agent-242fe959675180ebb455fe3d63c6c04f?source=copy_link>
+* **For more information, here is my Notion as a documentation for architecture decisions and setup instructions**: <https://www.notion.so/Travel-News-Automation-Agent-242fe959675180ebb455fe3d63c6c04f?source=copy_link>
 
 ---
 
