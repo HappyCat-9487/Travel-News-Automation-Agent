@@ -34,7 +34,7 @@ Before deploying this workflow, you will need the following items:
 
 2.  **Update Credentials**:
     * Open the `Call GPT API` node. In the **Headers** section, replace `Authorization: Bearer [Enter your OpenAI key]` with your own OpenAI API key.
-    * For the Slack nodes, refer to our [Slack Credential Setup](https://www.youtube.com/watch?v=qk5JH6ImK0I&t=161s) guide for instructions on correctly configuring OAuth2 credentials.
+    * For the Slack nodes, refer to our [Slack Credential Setup](https://youtu.be/qk5JH6ImK0I?si=vrtaWDmuEmGSCuu3) guide for instructions on correctly configuring OAuth2 credentials.
 
 3.  **Activate and Run**:
     * Save and activate the workflow in n8n.
@@ -54,6 +54,6 @@ The project's architecture is built on a clear, sequential workflow:
 
 ## Reference
 
-* **Video Guide for n8n Slack OAuth2 Credentials**: <https://www.youtube.com/watch?v=qk5JH6ImK0I&t=161s>
+* **Video Guide for n8n Slack OAuth2 Credentials**: <https://youtu.be/qk5JH6ImK0I?si=vrtaWDmuEmGSCuu3>
 
 
