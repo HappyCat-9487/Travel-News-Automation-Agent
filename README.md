@@ -1,45 +1,57 @@
 # Travel-News-Automation-Agent
+
 This project is an automated agent that uses n8n and OpenAI's GPT model to process news content. It fetches the latest articles from a specified RSS Feed, uses AI to summarize and categorize them, and pushes the most relevant content directly to a Slack channel.
 
-Core Features
-Automated News Fetching: Periodically retrieves articles from an RSS Feed.
+---
 
-AI Content Analysis: Uses GPT to generate summaries, extract key insights, and assign scores and categories.
+## Core Features
 
-Smart Filtering: Filters articles based on custom criteria such as category and relevance score.
+* **Automated News Fetching**: Periodically retrieves articles from an RSS Feed.
 
-Instant Notifications: Delivers processed content in a clear format to a Slack channel.
+* **AI Content Analysis**: Uses GPT to generate summaries, extract key insights, and assign scores and categories.
 
-Prerequisites
+* **Smart Filtering**: Filters articles based on custom criteria such as category and relevance score.
+
+* **Instant Notifications**: Delivers processed content in a clear format to a Slack channel.
+
+---
+
+## Prerequisites
+
 Before deploying this workflow, you will need the following items:
 
-An n8n instance.
+* An n8n instance.
 
-An OpenAI API key.
+* An OpenAI API key.
 
-A Slack Webhook URL or an OAuth2 app with the correct permissions.
+* A Slack Webhook URL or an OAuth2 app with the correct permissions.
 
-Deployment and Setup Guide
-Import the Workflow: Download the workflow.json file from this repository. In your n8n instance, select Import from JSON and upload the file.
+---
 
-Update Credentials:
+## Deployment and Setup Guide
 
-Open the Call GPT API node. In the Headers section, replace Authorization: Bearer [Enter your OpenAI key] with your own OpenAI API key.
+1.  **Import the Workflow**: Download the `workflow.json` file from this repository. In your n8n instance, select **Import from JSON** and upload the file.
 
-For the Slack nodes, refer to our Slack Credential Setup guide for instructions on correctly configuring OAuth2 credentials.
+2.  **Update Credentials**:
+    * Open the `Call GPT API` node. In the **Headers** section, replace `Authorization: Bearer [Enter your OpenAI key]` with your own OpenAI API key.
+    * For the Slack nodes, refer to our [Slack Credential Setup](https://www.google.com/search?q=link-to-your-notion-doc) guide for instructions on correctly configuring OAuth2 credentials.
 
-Activate and Run:
+3.  **Activate and Run**:
+    * Save and activate the workflow in n8n.
+    * You can either run it manually or set up a timed trigger for full automation.
 
-Save and activate the workflow in n8n.
+---
 
-You can either run it manually or set up a timed trigger for full automation.
+## Project Architecture
 
-Project Architecture
 The project's architecture is built on a clear, sequential workflow:
 
-RSS Feed -> GPT API -> Data Parsing -> Filtering -> Aggregation -> Slack Message
+`RSS Feed -> GPT API -> Data Parsing -> Filtering -> Aggregation -> Slack Message`
 
-Reference
-Video Guide for n8n Slack OAuth2 Credentials: https://www.youtube.com/watch?v=qk5JH6ImK0I&t=161s
+---
+
+## Reference
+
+* **Video Guide for n8n Slack OAuth2 Credentials**: <https://www.youtube.com/watch?v=qk5JH6ImK0I&t=161s>
 
 
