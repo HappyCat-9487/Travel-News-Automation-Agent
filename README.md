@@ -46,7 +46,7 @@ Before deploying this workflow, you will need the following items:
 
 The project's architecture is built on a clear, sequential workflow:
 
-![project architecture image](images/workflow_image.png)
+![project architecture image](images/Workflow_image.png)
 
 ---
 
