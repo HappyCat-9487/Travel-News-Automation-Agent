@@ -1,0 +1,433 @@
+{
+  "name": "TurMech workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "id": "f01bdfa9-65ec-4cf8-a02d-293be647b6f6",
+      "name": "Get Travel RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const rawContent = item.json.choices?.[0]?.message?.content || \"\";\n  let parsedGptData = {};\n\n  try {\n     // Attempt to parse the GPT response content directly as JSON\n    parsedGptData = JSON.parse(rawContent);\n  } catch (e) {\n    // If parsing fails, return a default error response\n    console.error(\"JSON parsing error:\", e);\n    return {\n      json: {\n        title: \"(Title error analyze)\",\n        link: \"(Link error analyze)\",\n        summary: \"(Summary error analyze)\",\n        insights: [],\n        score: 0,\n        category: \"(Category error analyze)\"\n      }\n    };\n  }\n\n  // Extract all fields from the parsed JSON object\n  // Note: GPT typically returns \"Title\" and \"Link\" with capital letters, so we match those keys\n  const title = parsedGptData.Title || \"(No title)\";\n  const link = parsedGptData.Link || \"(No link)\";\n  const summary = parsedGptData.summary || \"(No summary)\";\n  const insights = parsedGptData.insights || [];\n  const score = parsedGptData.score || 0;\n  const category = parsedGptData.category || \"(No category)\";\n\n  // Return the structured data\n  return {\n    json: {\n      title,\n      link,\n      summary,\n      insights,\n      score,\n      category\n    }\n  };\n});"
+      },
+      "id": "21b336b0-167c-4880-bdf5-a8cfa9ce53ed",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        400,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        -224
+      ],
+      "id": "17d78567-b318-4988-8ba1-4a751fdd7158",
+      "name": "Wait",
+      "webhookId": "0c2f3c19-fd21-45d0-8a5f-dd3a71da89d6"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C098477CEA2",
+          "mode": "list",
+          "cachedResultName": "testingbot"
+        },
+        "text": "={{ $json.combinedSlackMessage }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1136,
+        16
+      ],
+      "id": "65b7abd0-ecc9-4b4b-91e5-f5ea265ea1d0",
+      "name": "Send a message",
+      "webhookId": "51bd1856-fadf-4450-9590-535b446715dd",
+      "credentials": {
+        "slackApi": {
+          "id": "XZh311L7dOiYfVNb",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C098477CEA2",
+          "mode": "list",
+          "cachedResultName": "testingbot"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -208
+      ],
+      "id": "3dc71f80-c7fd-4a0e-ad90-3c7bbb1745bc",
+      "name": "Slack Trigger",
+      "webhookId": "0de89b8a-dce3-4f5e-9e4d-ce51592f1801",
+      "credentials": {
+        "slackApi": {
+          "id": "XZh311L7dOiYfVNb",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        784,
+        16
+      ],
+      "id": "8c0e23e4-3511-4ef4-921c-7193b3daaea9",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define a map of resource names to their URLs.\n// This is simpler since we only need the URL.\nconst resourceMap = {\n  \"cnn\": \"http://rss.cnn.com/rss/cnn_travel.rss.xml\",\n  \"bbc\": \"https://www.bbc.com/travel/feed.rss\",\n  \"tac\": \"https://www.travelagentcentral.com/rss/xml\",\n  // Add more resources here if needed.\n};\n\n// Get the user's message text from the Slack Trigger output.\nconst messageText = $input.first().json.blocks[0].elements[0].elements[1].text;\nconst requestedResourceName = messageText.trim().toLowerCase();\n\n// Look up the URL from our map\nconst urlToFetch = resourceMap[requestedResourceName] || null; // We set null if the key is not found in the map\n\n// Also get a list of all available resources for the error message.\nconst availableResources = Object.keys(resourceMap).join(', ');\n\n// Return a single item with the URL (or null) and other helpful info.\nreturn [{ json: { \n  url: urlToFetch, \n  requestedResource: requestedResourceName,\n  availableResources: availableResources\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -208
+      ],
+      "id": "b9261464-5ffb-403f-a3ae-7907fc31e8ac",
+      "name": "Get Single Resource URL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c5d458cd-926e-4052-aefd-f45e381bed1c",
+              "leftValue": "={{ $json.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        -208
+      ],
+      "id": "a2b14b6f-a621-44b3-9420-59dc2cfe4c30",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C098477CEA2",
+          "mode": "list",
+          "cachedResultName": "testingbot"
+        },
+        "text": "=Sorry, we don't have a resource for \"{{ $json.requestedResource }}\". \nAvailable resources are: {{ $json.availableResources }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        32
+      ],
+      "id": "6875de17-5be0-49da-a69b-4de7042c7d3b",
+      "name": "Send No URL Message",
+      "webhookId": "4a5a1a94-c1fe-48e0-9d0f-7a1f7268e95d",
+      "credentials": {
+        "slackApi": {
+          "id": "XZh311L7dOiYfVNb",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08a71400-4572-4133-ba0e-e59b225aae4c",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 0.75,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "db4a515f-5968-4eec-a0cc-1bf5564f5453",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "=Other",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        16
+      ],
+      "id": "c5dbdc21-c8b7-4ffb-aca2-ab752485a12f",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst article = item.json; // To receive the present article data\n\n// Replace special characters, converting double quotes to the HTML entity &quot; \n// This ensures that even if the original article content contains double quotes,\n//The JSON structure will remain intact.\n\n// Handle title\nif ($json.title !== undefined && $json.title !== null) {\n  $json.title = String($json.title).replace(/\"/g, '&quot;');\n}\n\n// Handle contentSnippet (use this if your prompt uses contentSnippet)\nif ($json.contentSnippet !== undefined && $json.contentSnippet !== null) {\n  $json.contentSnippet = String($json.contentSnippet).replace(/\"/g, '&quot;');\n}\n\n// Handle content (typically the full article content)\nif ($json.content !== undefined && $json.content !== null) {\n  $json.content = String($json.content).replace(/\"/g, '&quot;');\n}\n\n// Handle link (although quotes in URLs are rare, it's safer to process this too)\nif ($json.link !== undefined && $json.link !== null) {\n  $json.link = String($json.link).replace(/\"/g, '&quot;');\n}\n\n// --- Generate the prompt string for GPT ---\n// Note: This uses article.content, which is typically the full article body.\n// If you prefer using a shorter snippet, change `article.content` to `article.contentSnippet` below.\nconst prompt = JSON.stringify(`\nSummarize this travel article and extract key insights for travelers.\n\nTitle: ${article.title}\nContent: ${article.content}\nLink: ${article.link}\n\nPlease do the following for the article below:\n1. Put Title and Link at the front.\n2. Summarize it in 2-3 sentences.\n3. Extract 2-3 key insights.\n4. Based on the article's primary topic, assign a category from the following list: [\\\"Luxury\\\", \\\"Adventure\\\", \\\"Budget\\\", \\\"Cultural\\\", \\\"News\\\", \\\"Other\\\"].\n5. Rate its relevance to the **assigned category** (0 to 1). A higher score means the article is a better fit for that category.\n\nRespond ONLY in raw JSON, no markdown, no explanation.\n\n{\n\\\"Title\": \\\"Title\\\",\n\\\"Link\": \\\"Link\\\",\n\\\"summary\\\": \\\"...\\\",\n\\\"insights\\\": [\\\"...\\\", \\\"...\\\"],\n\\\"score\\\": 0.82,\n\\\"category\\\": \\\"Luxury\\\"\n}\n`).slice(1, -1);\n\n// Return the processed item, including the original article data and the generated prompt\nreturn {\n  json: {\n    ...article, // The article now includes escaped double quotes in title, contentSnippet, content, and link\n    prompt      // The newly generated prompt string for GPT\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -224
+      ],
+      "id": "ccaa785b-d7fe-4254-9d1e-0f561a504954",
+      "name": "Data preprocessing"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {
+          "bodyContentType": "json"
+        },
+        "bodyParametersJson": "={\n\"model\": \"gpt-3.5-turbo\",\n\"messages\": [\n{\n\"role\": \"user\",\n\"content\": \"{{ $json.prompt }}\"\n}\n],\n\"temperature\": 0.7\n}",
+        "headerParametersJson": "={\n\"Authorization\": \"Bearer [Enter your OpenAI key]\",\n\"Content-Type\": \"application/json\"\n}\n"
+      },
+      "id": "59200fb8-79bb-4bf7-88d5-9b9d3340698b",
+      "name": "Call OpenAI API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        208,
+        16
+      ],
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "maxTries": 3
+    },
+    {
+      "parameters": {
+        "jsCode": "// This Code node receives a single item from the Aggregate node.\n// Based on your input example, all article summary data is within the items[0].json.data array.\nconst allArticleSummaries = items[0].json.data; \n\nlet combinedMessage = \"=*Today's Travel News Summary Highlights*=\\n\"; // Slack bold title\ncombinedMessage += \"--------------------\\n\\n\"; // Slack separator line\n\n// Iterate through the allArticleSummaries array and combine each article summary into a long message\nallArticleSummaries.forEach((articleData, index) => {\n  // Extract information from each article data object\n  // Default value handling for potential missing/empty data\n  const title = articleData.title && articleData.title !== \"(No title)\" ? articleData.title : 'Article Title Not Available';\n  const link = articleData.link && articleData.link !== \"(No link)\" ? articleData.link : 'Article Link Not Available';\n  const summary = articleData.summary || '(No summary)';\n\n  // Format the insights array into a list format\n  const insights = articleData.insights && Array.isArray(articleData.insights) && articleData.insights.length > 0\n    ? articleData.insights.map(insight => `- ${insight}`).join('\\n') \n    : '(No insights)';\n\n  const score = articleData.score !== undefined ? articleData.score : '(No score)';\n  const category = articleData.category !== undefined ? articleData.category : '(No category)';\n\n  combinedMessage += `*Article ${index + 1}:*\\n`; // Mark the article number\n  combinedMessage += `*Title:* ${title}\\n`;\n  combinedMessage += `*Link:* ${link}\\n\\n`;\n  combinedMessage += `*Summary:*\\n${summary}\\n\\n`;\n  combinedMessage += `*Key Insights:*\\n${insights}\\n\\n`;\n  combinedMessage += `*Relevance Score:* ${score}\\n`;\n  combinedMessage += `*Category:* ${category}\\n`;\n  combinedMessage += `--------------------\\n\\n`; // Separator line between each article\n});\n\n// Return a single item containing this combined message\nreturn [{ json: { combinedSlackMessage: combinedMessage } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        16
+      ],
+      "id": "ef247f98-ddc2-4b2d-842e-918d4671aedc",
+      "name": "Combine Whole Message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Travel RSS": {
+      "main": [
+        [
+          {
+            "node": "Data preprocessing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Call OpenAI API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Single Resource URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Combine Whole Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Get Single Resource URL": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Travel RSS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send No URL Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data preprocessing": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call OpenAI API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Whole Message": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ab9029ce-e544-41ac-9b18-9348dc944b2d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7be6e7a66cf5a3dc057c9b482cb1d4413d737b3d4106e345355c3f26dd6e02ed"
+  },
+  "id": "owNvjHMcTgPOKeyu",
+  "tags": []
+}
