@@ -46,7 +46,7 @@ Before deploying this workflow, you will need the following items:
 
 The project's architecture is built on a clear, sequential workflow:
 
-`RSS Feed -> GPT API -> Data Parsing -> Filtering -> Aggregation -> Slack Message`
+(images/architecture.png)
 
 ---
 
