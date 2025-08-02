@@ -34,11 +34,13 @@ Before deploying this workflow, you will need the following items:
 
 2.  **Update Credentials**:
     * Open the `Call GPT API` node. In the **Headers** section, replace `Authorization: Bearer [Enter your OpenAI key]` with your own OpenAI API key.
-    * For the Slack nodes, refer to our [Slack Credential Setup](https://www.google.com/search?q=link-to-your-notion-doc) guide for instructions on correctly configuring OAuth2 credentials.
+    * For the Slack nodes, refer to our [Slack Credential Setup](https://www.youtube.com/watch?v=qk5JH6ImK0I&t=161s) guide for instructions on correctly configuring OAuth2 credentials.
 
 3.  **Activate and Run**:
     * Save and activate the workflow in n8n.
     * You can either run it manually or set up a timed trigger for full automation.
+    
+* **For more information, here is my Notion as a reference**: <https://www.notion.so/Travel-News-Automation-Agent-242fe959675180ebb455fe3d63c6c04f?source=copy_link>
 
 ---
 
