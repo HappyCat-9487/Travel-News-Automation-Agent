@@ -6,7 +6,7 @@ This project is an automated agent that uses n8n and OpenAI's GPT model to proce
 
 ## Core Features
 
-* **Automated News Fetching**: Periodically retrieves articles from an RSS Feed.
+* **News Fetching on Slack**: Retrieves articles from an RSS Feed by mentioning agent in Slack.
 
 * **AI Content Analysis**: Uses GPT to generate summaries, extract key insights, and assign scores and categories.
 
@@ -30,7 +30,7 @@ Before deploying this workflow, you will need the following items:
 
 ## Deployment and Setup Guide
 
-1.  **Import the Workflow**: Download the `workflow.json` file from this repository. In your n8n instance, select **Import from JSON** and upload the file.
+1.  **Import the Workflow**: Download the `Workflow.json` file from this repository. In your n8n instance, select **Import from JSON** and upload the file.
 
 2.  **Update Credentials**:
     * Open the `Call GPT API` node. In the **Headers** section, replace `Authorization: Bearer [Enter your OpenAI key]` with your own OpenAI API key.
